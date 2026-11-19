@@ -1,0 +1,28 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "devices":        { ".read": false, ".write": false },
+    "clinicians":     { ".read": false, ".write": false },
+    "patientUsers":   { ".read": false, ".write": false },
+
+    "index": {
+      ".read": "auth != null && root.child('clinicians').child(auth.uid).val() === true",
+      "$pid": {
+        ".read": "auth != null && root.child('patientUsers').child(auth.uid).val() === $pid",
+        ".write": "auth != null && root.child('devices').child(auth.uid).val() === $pid"
+      }
+    },
+
+    "patients": {
+      "$pid": {
+        ".read": "auth != null && (root.child('clinicians').child(auth.uid).val() === true || root.child('patientUsers').child(auth.uid).val() === $pid)",
+        ".write": "auth != null && root.child('devices').child(auth.uid).val() === $pid",
+        "cmd": {
+          ".write": "auth != null && (root.child('devices').child(auth.uid).val() === $pid || root.child('patientUsers').child(auth.uid).val() === $pid || root.child('clinicians').child(auth.uid).val() === true)"
+        }
+      }
+    }
+  }
+}
